@@ -4,27 +4,202 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 public class LeetPractice {
 
 	public static void main(String[] args) {
 
-		int[] time = { 115, 60, 60, 60, 5 };
-		int[] time1 = { 30, 20, 150, 100, 40 };
+		String s1 = "quick", s2 = "aquiqckbroqciuknfox";
 
-		int[] prices = { 1, -1, 0 };
-//		1,2,3,4,5,6 7, 1, 5, 3, 6, 4 
+//		System.out.println(minSubArrayLen(15, nums));
+	}
 
-//		System.out.println('1' - 0);
-		String s = "00011000";
+	public static boolean checkInclusion(String s1, String s2) {
 
-		System.out.println(subarraySum(prices, 0));
+		if (s1.length() > s2.length())
+			return false;
+		if (s2.contains(s1))
+			return true;
 
+		int left = 0, right = s1.length() - 1, match = 0;
+		Map<Character, Integer> sc1 = new HashMap<Character, Integer>();
+//		Map<Character, Integer> sc2 = new HashMap<Character, Integer>();
+
+		for (int i = 0; i < s1.length(); i++) {
+			char c = s1.charAt(i);
+			if (sc1.containsKey(c))
+				sc1.put(c, sc1.get(c) + 1);
+			else
+				sc1.put(c, 1);
+		}
+
+		while (right < s2.length()) {
+
+			char c = s2.charAt(right);
+
+			if (sc1.containsKey(c)) {
+				match += 1;
+			} else {
+				left++;
+				right++;
+				match = 0;
+			}
+
+//			if(right<s1.length())
+		}
+
+//		for (int i = 0; i < s2.length(); i++) {
+//
+//			char c = s2.charAt(i);
+//
+//			if (!sc1.containsKey(c)) {
+//				continue;
+//			}
+//		}
+
+		int len1 = s1.length();
+		for (int i = 0; i < s2.length(); i++) {
+
+		}
+
+		return false;
+	}
+
+	public static int minSubArrayLen(int target, int[] nums) {
+
+//		Arrays.sort(nums);
+
+		int left = 0, right = 0, min = Integer.MAX_VALUE, sum = 0;
+
+		while (right < nums.length) {
+
+			sum += nums[right++];
+
+			while (sum >= target) {
+				min = Math.min(right - left, min);
+				sum -= nums[left];
+				left++;
+			}
+
+		}
+
+		return min == Integer.MAX_VALUE ? 0 : min;
+	}
+
+	public static int lengthOfLongestSubstring(String s) {
+
+		int max = 0, left = 0, right = 0;
+
+		Map<Character, Integer> map = new HashMap<Character, Integer>();
+
+		while (right < s.length()) {
+			char c = s.charAt(right);
+
+			if (map.containsKey(c) && map.get(c) >= left) {
+				max = Math.max(max, right - left);
+				left = map.get(c) + 1;
+			}
+			map.put(c, right);
+			right++;
+		}
+
+		return Math.max(max, right - left);
+	}
+
+	public static int[] twoSum(int[] nums, int target) {
+
+		int left = 0, right = nums.length - 1;
+
+		while (left < right) {
+
+			int sum = nums[left] + nums[right];
+
+			if (sum < target)
+				left++;
+			else if (sum > target)
+				right--;
+			else
+				return new int[] { left, right };
+		}
+
+		return null;
+	}
+
+	public static double findMaxAverage(int[] nums, int k) {
+
+		int left = 0, right = 0, sum = 0, max;
+
+		while (right < k) {
+			sum += nums[right++];
+		}
+		max = Math.max(Integer.MIN_VALUE, sum);
+
+		while (right < nums.length) {
+			sum += nums[right++] - nums[left++];
+			max = Math.max(max, sum);
+		}
+		return max * 1.0 / k;
+	}
+
+	public static int maxArea(int[] height) {
+
+		int left = 0, right = height.length - 1, max = 0;
+
+		while (left < right) {
+			max = Math.max(max, (right - left) * Math.min(height[left], height[right]));
+			int h = Math.min(height[left], height[right]);
+
+			while (left < right && height[left] <= h)
+				left++;
+			while (left < right && height[right] <= h)
+				right--;
+		}
+
+		return max;
+	}
+
+	public static List<List<Integer>> threeSum(int[] nums) {
+
+		int l = nums.length;
+		if (nums == null || l < 3)
+			return new ArrayList<List<Integer>>();
+		Arrays.sort(nums);
+		List<List<Integer>> list = new ArrayList<List<Integer>>();
+		int left = 0, right = 0;
+
+		for (int i = 0; i < l - 2; i++) {
+			if (i > 0 && nums[i] == nums[i - 1])
+				continue;
+			left = i + 1;
+			right = l - 1;
+			while (left < right) {
+				int sum = nums[i] + nums[left] + nums[right];
+				if (sum == 0) {
+					list.add(Arrays.asList(nums[i], nums[left], nums[right]));
+					left++;
+					right--;
+					while (left < right && nums[left] == nums[left - 1])
+						left++;
+					while (left < right && nums[right] == nums[right + 1])
+						right--;
+				} else if (sum > 0) {
+					right--;
+					while (left < right && nums[right] == nums[right + 1])
+						right--;
+				} else {
+					left++;
+					while (left < right && nums[left] == nums[left - 1])
+						left++;
+				}
+			}
+		}
+		return list;
 	}
 
 	public static int subarraySum(int[] nums, int k) {
