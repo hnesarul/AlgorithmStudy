@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +16,93 @@ public class LeetPractice {
 
 	public static void main(String[] args) {
 
-		String s1 = "quick", s2 = "aquiqckbroqciuknfox";
+		String s = "bba", t = "ab";
 
-//		System.out.println(minSubArrayLen(15, nums));
+//		System.out.println(t.substring(1, 3));
+		System.out.println(minWindow1(s, t));
+	}
+
+	public static String minWindow2(String s, String t) {
+
+		Map<Character, Integer> tmap = new HashMap<Character, Integer>();
+		Map<Character, Integer> smap = new HashMap<Character, Integer>();
+
+		for (int i = 0; i < t.length(); i++) {
+			char c = t.charAt(i);
+			tmap.put(c, tmap.getOrDefault(c, 1));
+			smap.put(c, 0);
+		}
+		
+		
+		return "";
+	}
+
+	public static String minWindow1(String s, String t) {
+//		76. Minimum Window Substring
+		Map<Character, Integer> mt = new HashMap<Character, Integer>();
+		Map<Character, Integer> ms = new HashMap<Character, Integer>();
+		int sum = 0, left = 0, right = 0, min = 0, max = 0, len = Integer.MAX_VALUE, found = 0, have = 0;
+
+		for (int i = 0; i < t.length(); i++) {
+			char c = t.charAt(i);
+			mt.put(c, mt.getOrDefault(c, 1) + 1);
+			ms.put(c, 0);
+		}
+
+		while (right < s.length()) {
+
+			char c = s.charAt(right);
+			right++;
+			if (mt.containsKey(c)) {
+				if (ms.get(c) == 0)
+					have += 1;
+				ms.put(c, ms.get(c) + 1);
+				found += 1;
+
+				if (found == have) {
+					while (!mt.containsKey(s.charAt(left))) {
+						left++;
+					}
+
+					if (len > right - left) {
+						min = left;
+						max = right;
+						len = max - min;
+					}
+
+					if (ms.containsKey(s.charAt(left))) {
+						char ch = s.charAt(left);
+						ms.put(ch, ms.get(ch) - 1);
+						found -= 1;
+					}
+					left++;
+				}
+			}
+		}
+		return s.substring(min, max);
+	}
+
+	public static String minWindow(String s, String t) {
+
+		if (t.length() > s.length())
+			return "";
+
+		Map<Character, Integer> arrt = new HashMap<Character, Integer>();
+		Map<Character, Integer> arrs = new HashMap<Character, Integer>();
+		Map<Integer, String> substr = new HashMap<Integer, String>();
+
+		return minLength(substr);
+	}
+
+	public static String minLength(Map<Integer, String> map) {
+
+		int min = Integer.MAX_VALUE;
+		for (Map.Entry<Integer, String> set : map.entrySet()) {
+			if (set.getKey() < min)
+				min = set.getKey();
+		}
+
+		return map.get(min);
 	}
 
 	public static boolean checkInclusion(String s1, String s2) {
@@ -27,48 +112,49 @@ public class LeetPractice {
 		if (s2.contains(s1))
 			return true;
 
-		int left = 0, right = s1.length() - 1, match = 0;
+		int left = 0, right = s1.length(), match = 26;
 		Map<Character, Integer> sc1 = new HashMap<Character, Integer>();
-//		Map<Character, Integer> sc2 = new HashMap<Character, Integer>();
+		Map<Character, Integer> sc2 = new HashMap<Character, Integer>();
+
+		for (char c = 'a'; c <= 'z'; c++) {
+			sc1.put(c, 0);
+			sc2.put(c, 0);
+		}
 
 		for (int i = 0; i < s1.length(); i++) {
-			char c = s1.charAt(i);
-			if (sc1.containsKey(c))
-				sc1.put(c, sc1.get(c) + 1);
-			else
-				sc1.put(c, 1);
+			char c1 = s1.charAt(i);
+			char c2 = s2.charAt(i);
+			sc1.put(c1, sc1.get(c1) + 1);
+			sc2.put(c2, sc2.get(c2) + 1);
 		}
+
+		for (char c = 'a'; c <= 'z'; c++)
+			if (!sc1.get(c).equals(sc2.get(c)))
+				match -= 1;
 
 		while (right < s2.length()) {
 
-			char c = s2.charAt(right);
+			if (match == 26)
+				return true;
 
-			if (sc1.containsKey(c)) {
+			char cr = s2.charAt(right++);
+			sc2.put(cr, sc2.get(cr) + 1);
+			if (sc1.get(cr).equals(sc2.get(cr)))
 				match += 1;
-			} else {
-				left++;
-				right++;
-				match = 0;
-			}
+			else if (sc1.get(cr) + 1 == (sc2.get(cr)))
+				match -= 1;
 
-//			if(right<s1.length())
-		}
-
-//		for (int i = 0; i < s2.length(); i++) {
-//
-//			char c = s2.charAt(i);
-//
-//			if (!sc1.containsKey(c)) {
-//				continue;
-//			}
-//		}
-
-		int len1 = s1.length();
-		for (int i = 0; i < s2.length(); i++) {
+			char cl = s2.charAt(left++);
+			sc2.put(cl, sc2.get(cl) - 1);
+			if (sc1.get(cl).equals(sc2.get(cl)))
+				match += 1;
+			else if (sc1.get(cl) + 1 == (sc2.get(cl)))
+				match -= 1;
 
 		}
 
-		return false;
+		return match == 26;
+
 	}
 
 	public static int minSubArrayLen(int target, int[] nums) {
